@@ -1,0 +1,25 @@
+name: Markdown only
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check-files:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fail on non-Markdown files
+        run: |
+          bad=$(git ls-files \
+            | grep -v -E '\.md$' \
+            | grep -v -E '^(\.gitignore|\.github/workflows/.*\.yml)$' \
+            || true)
+          if [ -n "$bad" ]; then
+            echo "::error::Non-Markdown files found:"
+            echo "$bad"
+            exit 1
+          fi
+          echo "All files are Markdown."
